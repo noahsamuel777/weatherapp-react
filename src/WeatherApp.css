@@ -1,0 +1,47 @@
+/* WeatherApp.css */
+.temperature {
+    font-size: 5vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .location {
+    font-size: 2.5vw;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+  }
+  
+  .weather {
+    font-size: 4vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .box-container {
+   
+    height: 50%;
+    width: 50%;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .box {
+    height: 100px;
+   
+    width: 200px;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    text-align: center;
+  }
+  

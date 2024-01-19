@@ -1,0 +1,118 @@
+
+import React, { useEffect, useState } from "react";
+import "bootstrap/dist/css/bootstrap.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLocationDot, faSearch } from "@fortawesome/free-solid-svg-icons";
+import './WeatherApp.css';
+
+const api = {
+  key: "ea3d7f1c1adb60c82c8a2d34022552fb",
+  base: "https://api.openweathermap.org/data/2.5/",
+  iconBase: "https://openweathermap.org/img/wn/",
+};
+
+const WeatherApp = () => {
+  const [search, setSearch] = useState("");
+  const [search1, setSearch1] = useState("");
+  const [state, setState] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let url = "";
+        if (search1 !== "") {
+          url = `${api.base}weather?q=${search1}&appid=${api.key}&units=metric`;
+        } else if (navigator.geolocation) {
+          const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          });
+          const { latitude, longitude } = position.coords;
+          url = `${api.base}weather?lat=${latitude}&lon=${longitude}&appid=${api.key}&units=metric`;
+        }
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Error fetching data");
+        }
+
+        const data = await response.json();
+        setState(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [search1]);
+
+  const handleSearchClick = () => {
+    setSearch1(search);
+    setSearch("");
+  };
+
+  console.log(state);
+
+  const iconUrl = state.weather && state.weather.length > 0
+    ? `${api.iconBase}${state.weather[0].icon}@2x.png`
+    : null;
+
+  return (
+    <div style={{padding:'10px', display:'flex',alignItems:'center',justifyContent:'center'}} className="main">
+      <div style={{ border: "1px solid #dddddd",padding:'10px',boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",borderRadius:'20px'}} className="container mt-5 ">
+        <div className="momo">
+          <div className="d-flex flex-column align-items-center mt-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleSearchClick(); }} className="d-flex gap-2 mt-3">
+              <div className="input-group">
+                <span className="input-group-text" id="basic-addon1">
+                  <FontAwesomeIcon icon={faLocationDot} />
+                </span>
+                <input
+                  autoFocus
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search..."
+                  className="form-control"
+                  type="text"
+                />
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  id="basic-addon2"
+                  onClick={handleSearchClick}
+                >
+                  <FontAwesomeIcon icon={faSearch} />
+                </button>
+              </div>
+            </form>
+          </div>
+          <div className="d-flex flex-column align-items-center mt-4">
+            <div className="box-container d-flex justify-content-center align-items-center mb-4">
+              <div style={{backgroundColor:'rgba(202, 253, 253, 0.475)'}} className="box text-center">
+                <h1 className="temperature">
+                  {state.main && Math.round(state.main.temp)}
+                  <sup>o</sup>C
+                </h1>
+              </div>
+              <div  className="box text-center">
+                {iconUrl && <img src={iconUrl} alt="Weather Icon" />}
+              </div>
+              <div style={{backgroundColor:'rgba(202, 253, 253, 0.475)'}} className="box text-center">
+                {state.weather && state.weather.length > 0 && (
+                  <h3 className="weather">{state.weather[0].main}</h3>
+                )}
+              </div>
+              <div style={{backgroundColor:'rgba(202, 253, 253, 0.475)'}} className="box text-center">
+                <h1 className="location">
+                  {state.name}
+                </h1>
+              </div>
+             
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WeatherApp;

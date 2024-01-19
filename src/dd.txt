@@ -1,0 +1,79 @@
+import React, { useEffect, useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLocationDot, faSearch } from '@fortawesome/free-solid-svg-icons';
+
+const api = {
+  key: "ea3d7f1c1adb60c82c8a2d34022552fb",
+  base: "https://api.openweathermap.org/data/2.5/"
+};
+
+const WeatherApp = () => {
+  const [search, setSearch] = useState('');
+  const [search1, setSearch1] = useState('');
+  const [state, setState] = useState('');
+
+  useEffect(() => {
+    if (search1 !== '') {
+      fetch(`${api.base}weather?q=${search1}&appid=${api.key}&units=metric`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('error');
+          }
+          return res.json();
+        })
+        .then((data) => setState(data));
+    }else{
+        if(navigator.geolocation){
+           console.log( navigator.geolocation.getCurrentPosition((data)=>{
+               console.log(data.coords)
+                    const {latitude,longitude}=data.coords
+                    console.log(latitude,longitude);
+           }));
+        }
+    }
+  }, [search1]);
+
+  const handleSearchClick = () => {
+    setSearch1(search);
+    setSearch('');
+  };
+
+  console.log(state);
+
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '50px',padding:'10px' }}>
+      <div className='momo' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', border: '1px solid #dddddd', width: '90%', boxShadow: '5px 5px 15px rgba(0, 0, 0, 0.3)', borderRadius: '20px',padding:"20px" }}>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center', marginTop: '20px' }}>
+          <form onSubmit={(e) => { e.preventDefault(); handleSearchClick(); }} style={{ display: 'flex', gap: '10px', marginTop: '10px' }} action="">
+            <div style={{boxShadow: '5px 5px 15px rgba(0, 0, 0, 0.3)'}} className="input-group mb-3">
+              <span className="input-group-text" id="basic-addon1">
+                <FontAwesomeIcon icon={faLocationDot} />
+              </span>
+              <input
+                autoFocus
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder='Search...'
+                className='form-control '
+                type="text"
+              />
+              <button type="button" className="input-group-text" id="basic-addon2" onClick={handleSearchClick}>
+                <FontAwesomeIcon icon={faSearch} />
+              </button>
+            </div>
+          </form>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center', marginTop: '30px' }}>
+          <h1 style={{ fontSize: '50px', fontWeight: '30px' }}>{state.name}</h1>
+          <h1 style={{ fontSize: '80px' }}>{state.main && Math.round(state.main.temp)}<sup>o</sup>c</h1>
+          {state.weather && state.weather.length > 0 && (
+            <h3 style={{ fontSize: '50px' }}>{state.weather[0].main}</h3>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WeatherApp;
